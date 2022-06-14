@@ -1,6 +1,6 @@
-CREATE TABLE todos (
-    ID int NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    task VARCHAR(50) NOT NULL,
-    description VARCHAR(1000),
-    is_done BOOLEAN 
-)
+-- CREATE TABLE todos (
+--     ID int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+--     task VARCHAR(50) NOT NULL,
+--     description VARCHAR(1000),
+--     is_done BOOLEAN 
+-- )
