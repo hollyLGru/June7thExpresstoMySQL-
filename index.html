@@ -9,9 +9,15 @@
 <body>
     <div>API Documentation</div>
     <h2>Get /Todos</h2>
-    <span> this route can be used to create a todo item . but only the id, is_done, task are included</span>
+    <span> this route can be used to retrieve a todo item . but only the id, is_done, task are included</span>
+    <h2>GET /Todos/:id</h2>
+    <span> We can retrieve a todo based on the ID for that specific to do  </span>
     <h2>Post /Todos</h2>
-    <span> </span>
+    <span> This route can be used to create a todo item. The body of the request should include the task description</span>
+    <h2>Delete /Todos</h2>
+    <span> This route will delete the Todo based on ID </span>
+    <h2>Update /Todos</h2>
+    <span> We can change a todo item with this route. We need an ID with this to know what todo to change </span>
 
 </body>
 </html>
