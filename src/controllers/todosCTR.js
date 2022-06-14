@@ -9,7 +9,7 @@ let db = require("../model/db");
 //  function to return a summary of items on the response :
 let itemSummary = function(req, res){
     console.log("list/summary of items");
-    let sql = "select id, task, is_done from todos";
+    let sql = "select id, task, description, is_done from todos";
     // this is what we want to retrieve from mySQL(beekeeper) to show on postman. 
     // this SQL statement is directly from beekeeper
 
@@ -29,7 +29,6 @@ let itemSummary = function(req, res){
 // function to return detail of single item (ID)
 let itemDetails = function(req, res){
     console.log("list details of an item by ID");
-
     let id = req.params.id;
     // so that when you type in the search bar the id #, this will assign what id you are searching for
 
@@ -62,21 +61,106 @@ let itemDetails = function(req, res){
 };
 
 // function to create a new item
+// what we want request to look like : 
+// {
+//     "task"  : "clean the car"
+//     "description" : "use soap and water"
+// }
+
 let createItem = function(req, res){
     console.log("creating a new item");
-    res.sendStatus(204); 
+    let input = req.body;
+    // it will be like the task example above that will be typed on postman body 
+    let task = input.task;
+    let description = input.description;
+
+    if(!task) // if task is falsey (if they do not include a task)
+        {
+            res.status(400).send("task is required");
+            return;
+        }
+
+        // below is example of parameterized sql which avoids sql injections
+        let sql = "insert into todos(task, description) values (?, ?)";
+        let params = [task, description];
+
+        db.query(sql, params, function(err, results){
+            if(err){
+                console.log("could not execute SQL insert ", err);
+                res.sentStatus(500);
+            } else {
+                res.sendStatus(204); // we dont have anything to return but that lets client know that everything went according to plan
+            }
+        });
+
+
 };
+
 
 // function to update an item
 let updateItem = function(req, res){
     console.log("we are updating an item");
-    res.sendStatus(204); 
+
+    let id = req.params.id;
+    // get the id from the path param
+    let body = req.body;
+
+    let task = body.task;
+    let description = body.description;
+    let isDone = body.is_done;
+
+    //make sure the task (by ID) is in the body
+    if(!task){
+        res.status(400).send("task is required");
+        return;
+    } 
+
+    // if isDone is not selected as true or false, client will get error message. 
+    if(isDone != true && isDone != false){
+        res.status(400).send("isDone must be either true or false");
+        return;
+    }
+
+    let isDoneInt; 
+    if (isDone == true){
+        isDoneInt = 1;
+    } else {
+        isDoneInt = 0
+    }
+    // the code above is because mySQL does not have booleans but instead 0 and 1 
+
+
+    let sql = "update todos set task = ?, description = ?, is_done = ? where id = ? ";
+    let params = [task, description, isDoneInt, id];
+
+    db.query(sql, params, function(err, results){
+        if(err){
+            console.log("couldnt execute updated SQL" , err);
+            res.sendStatus(500); //this isnt client's fault so thats why we sent 500
+        } else {
+            res.sendStatus(204); //let client know everything went well but we dont have data to send back 
+        }
+    })
+
 };
 
 // deleting an item:
 let deleteItem = function(req, res){
     console.log("we are deleting an item");
-    res.sendStatus(204); 
+    let id = req.params.id;
+
+    let sql = "delete from todos where id = ?"
+    let params = [id]
+
+    db.query(sql, params, function(err, results){
+        if(err){
+            console.log("failed to delete item with id " +id, err)
+            res.sendStatus(500)
+        } else {
+            res.sendStatus(204) // nothing to send back, but everything went as planned
+        }
+    })
+
 };
 
 module.exports = {
